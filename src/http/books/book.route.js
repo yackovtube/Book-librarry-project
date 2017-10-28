@@ -1,78 +1,64 @@
 const Router = require('express').Router;
 const BookValidaitors = require('./book.validators');
+const BookCtrl = require('./book.ctrl');
 
-class BookRouterProvider{
+class BookRouterProvider {
 
-    constructor(){
+    constructor() {
         this._initValidatiors();
     }
 
-    create(){
+    create() {
         let router = Router();
+        let bookCtrl = new BookCtrl;
 
-        router.get('/', function(req,res){
-            res.send('Hello world')
-        })
-        
-        router.get('/:id', [this.idValidateMW, function(req,res){
-            res.send('Book: ' + req.params.id)
-        }])
+        router.get('/', bookCtrl.getAll)
+        router.get('/:id', [this.idValidateMW, bookCtrl.getBookById]);
+        router.delete('/:id', [this.idValidateMW, bookCtrl.delete])
+        router.post('/', [this.newBookValidateMw, bookCtrl.create])
+        router.put('/:id', [this.idValidateMW, this.updateBookValidateMW, bookCtrl.update])
 
-        router.post('/', [this.newBookValidateMw ,function(req,res){
 
-            console.log(req.body);
-
-            res.send(req.body)
-        }])
-        
-        router.put('/:id', [this.idValidateMW, this.updateBookValidateMW, function(req,res){
-            res.send('Book: ' + req.params.id + ' udated')
-        }])
-
-        router.delete('/:id', [this.idValidateMW ,function(req,res){
-            res.send('Dlete: ' + req.params.id)
-        }])
-        
         return router;
     }
 
-    _initValidatiors(){
+    _initValidatiors() {
         var bookValidators = new BookValidaitors;
 
-        this.idValidateMW = function(req, res, next){
+        this.idValidateMW = function (req, res, next) {
 
-            try{
+            try {
                 req.params.id = bookValidators.validateId(req.params.id);
                 next();
             }
-            catch(e){
+            catch (e) {
                 res.status(400);
                 res.send(e.message);
             }
         }
 
-        this.newBookValidateMw = function(req, res, next){
-            try{
+        this.newBookValidateMw = function (req, res, next) {
+            try {
                 req.body = bookValidators.validateNewBook(req.body);
                 next();
             }
-            catch(e){
+            catch (e) {
                 res.status(400);
                 res.send(e.message);
             }
         }
 
-        this.updateBookValidateMW = function(req, res, next){
-            try{
+        this.updateBookValidateMW = function (req, res, next) {
+            try {
                 req.body = bookValidators.validateUpdateBook(req.body);
                 next();
             }
-            catch(e){
+            catch (e) {
                 res.status(400);
                 res.send(e.message);
             }
         }
-        
+
 
     }
 
