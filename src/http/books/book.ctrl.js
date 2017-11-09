@@ -5,14 +5,14 @@ class bookCtrl {
 
         let id = req.params.id;
 
-        bookService.getByid(id)
-            .then((book)=>{
-                res.json(book);
-            })
-            .catch((err) => {
-                res.status(404);
-                res.end();
-            })
+        // bookService.getByid(id)
+        //     .then((book)=>{
+        //         res.json(book);
+        //     })
+        //     .catch((err) => {
+        //         res.status(404);
+        //         res.end();
+        //     })
 
         let book = _.find(books, { 'id': id });
 

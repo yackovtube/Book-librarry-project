@@ -2,6 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const Sequelize = require('sequelize');
+
+const db = require('../models');
+const User = require('../models/user');
 
 const BookRouterProvider = require('./http/books/book.route');
 
@@ -21,6 +25,7 @@ class App {
 
     _init() {
         this._initRoutes();
+        this._initDb();
 
         this.express = express();
 
@@ -29,43 +34,43 @@ class App {
         this.express.use(bodyParser.json());
 
         //authenticaiton
-        this.express.post('/api/v1/token', function(req, res){
+        this.express.post('/api/v1/token', function (req, res) {
 
             let username = req.body.username;
             let password = req.body.password;
 
-            if(username == 'admin' && password == 'password'){
+            if (username == 'admin' && password == 'password') {
 
-                var token = jwt.sign({ user : { id: Date.now() } }, JWT_SECRET);
+                var token = jwt.sign({ user: { id: Date.now() } }, JWT_SECRET);
 
-                res.cookie('token' , token);
+                res.cookie('token', token);
 
                 res.json({
                     token: token
                 });
             }
-            else{
+            else {
                 res.status(401);
                 res.end();
             }
 
         });
 
-        this.express.get('/api/v1/me', function(req, res){
+        this.express.get('/api/v1/me', function (req, res) {
 
-            try{
+            try {
                 let toDecode;
-                if(req.headers["x-auth"]){
+                if (req.headers["x-auth"]) {
                     toDecode = req.headers["x-auth"];
                 }
-                else{
+                else {
                     toDecode = res.cookies.token;
                 }
 
                 var token = jwt.verify(toDecode, JWT_SECRET);
                 res.send(token.user);
             }
-            catch(e){
+            catch (e) {
                 res.status(401);
                 res.end();
             }
@@ -80,6 +85,23 @@ class App {
         let bookRouterProvider = new BookRouterProvider;
 
         this.bookRoute = bookRouterProvider.create();
+
+    }
+
+    _initDb() {
+
+        // db.User.create({
+        //     firstName: 'John',
+        //     lastName: 'Hancock',
+        //     username: 'test',
+        //     password: 'test',
+        //     email: 'test',
+        // });
+
+
+        db.User.findAll().then(users => {
+            console.log(users.length)
+        })
 
     }
 
