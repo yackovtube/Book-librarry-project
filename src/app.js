@@ -4,18 +4,27 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const Sequelize = require('sequelize');
 
-const db = require('../models');
-const User = require('../models/user');
+const db = require('./db/models');
 
 const BookRouterProvider = require('./http/books/book.route');
+const UserService = require('./services/user.service');
+
 
 const JWT_SECRET = 'shhhhh';
 
 class App {
     constructor() {
 
-        this._init();
-        console.log('loged on');
+        Promise.all([
+            this._initDb(),
+            this._initServices(),
+            this._initRoutes(),
+            this._initHttp()
+        ])
+            .catch(err => {
+                console.error('bootstraping error', err);
+                process.exit(1);
+            });
     }
 
     run() {
@@ -23,10 +32,23 @@ class App {
         console.log('runing...');
     }
 
-    _init() {
-        this._initRoutes();
-        this._initDb();
+    _initServices() {
+        this.userService = new UserService();
+        return Promise.resolve();
+    }
 
+    _initRoutes() {
+        let bookRouterProvider = new BookRouterProvider;
+
+        this.bookRoute = bookRouterProvider.create();
+
+        return Promise.resolve();
+
+    }
+
+    _initHttp() {
+
+        let _this = this;
         this.express = express();
 
         //middlewares
@@ -39,20 +61,27 @@ class App {
             let username = req.body.username;
             let password = req.body.password;
 
-            if (username == 'admin' && password == 'password') {
+            _this.userService.getByCradentials(username, password)
+                .then(user => {
 
-                var token = jwt.sign({ user: { id: Date.now() } }, JWT_SECRET);
+                    if (user === null) {
+                        throw new Error('invalid credentials');
+                    }
 
-                res.cookie('token', token);
+                    console.log('User login: ' + user.id + ' | ' + user.email, new Date);
 
-                res.json({
-                    token: token
+                    var token = jwt.sign({ user: user.id }, JWT_SECRET);
+                    res.cookie('token', token);
+
+                    res.json({
+                        token: token
+                    });
+                    
+                })
+                .catch(err => {
+                    res.status(401);
+                    res.end();
                 });
-            }
-            else {
-                res.status(401);
-                res.end();
-            }
 
         });
 
@@ -79,29 +108,22 @@ class App {
         //routes
         this.express.use('/api/v1/books', this.bookRoute);
 
-    }
-
-    _initRoutes() {
-        let bookRouterProvider = new BookRouterProvider;
-
-        this.bookRoute = bookRouterProvider.create();
+        return Promise.resolve();
 
     }
 
     _initDb() {
 
-        // db.User.create({
-        //     firstName: 'John',
-        //     lastName: 'Hancock',
-        //     username: 'test',
-        //     password: 'test',
-        //     email: 'test',
-        // });
-
-
-        db.User.findAll().then(users => {
-            console.log(users.length)
-        })
+        return db.sequelize.authenticate()
+            .then(() => {
+                console.log('DB Connection has been established successfully.');
+                return db;
+            })
+            .catch(err => {
+                console.error('Unable to connect to the database:', err);
+                //TODO: handle bootstrap error
+                throw err;
+            })
 
     }
 
