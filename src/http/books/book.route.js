@@ -12,11 +12,11 @@ class BookRouterProvider {
         let router = Router();
         let bookCtrl = new BookCtrl;
 
-        router.get('/', bookCtrl.getAll)
-        router.get('/:id', [this.idValidateMW, bookCtrl.getBookById]);
-        router.delete('/:id', [this.idValidateMW, bookCtrl.delete])
-        router.post('/', [this.newBookValidateMw, bookCtrl.create])
-        router.put('/:id', [this.idValidateMW, this.updateBookValidateMW, bookCtrl.update])
+        router.get('/', bookCtrl.getAll.bind(bookCtrl) );
+        router.get('/:id', [this.idValidateMW, bookCtrl.getBookById.bind(bookCtrl)]);
+        router.delete('/:id', [this.idValidateMW, bookCtrl.delete.bind(bookCtrl)])
+        router.post('/', [this.newBookValidateMw, bookCtrl.create.bind(bookCtrl)])
+        router.put('/:id', [this.idValidateMW, this.updateBookValidateMW, bookCtrl.update.bind(bookCtrl)])
 
 
         return router;

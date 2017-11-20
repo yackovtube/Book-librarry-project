@@ -1,60 +1,109 @@
 const _ = require('lodash')
+const BooskServices = require('../../services/book.service');
+
 
 class bookCtrl {
-    getBookById(req, res) {
 
+    constructor() {
+        this.bookService = new BooskServices();
+    }
+
+    getBookById(req, res) {
         let id = req.params.id;
 
-        // bookService.getByid(id)
-        //     .then((book)=>{
-        //         res.json(book);
-        //     })
-        //     .catch((err) => {
-        //         res.status(404);
-        //         res.end();
-        //     })
-
-        let book = _.find(books, { 'id': id });
-
-        if (book == undefined) {
-            res.status(404);
-            res.send()
-        }
-        else {
-            res.json(book)
-        }
+        this.bookService.getBookById(id)
+            .then((book) => {
+                if (book == undefined) {
+                    res.status(404);
+                    res.send()
+                }
+                res.json(book)
+            }).catch((err) => {
+                res.status(404);
+                res.send()
+            })
 
     }
 
     getAll(req, res) {
-        res.json(books)
+        this.bookService.getAllBooks()
+            .then((books) => {
+                res.json(books);
+            })
+            .catch((err) => {
+                res.status(404);
+                res.end();
+            })
     }
+
+    //getAll(req, res) {
+    //  res.json(books)
+    //}
+
+    // delete(req, res) {
+
+    //     let id = req.params.id;
+    //     let removedBooks = _.remove(books, o => o.id == id);
+
+    //     if (removedBooks.length == 0) {
+    //         res.status(404);
+    //         res.send()
+    //     }
+    //     else {
+    //         res.json(removedBooks[0]);
+    //     }
+    // }
 
     delete(req, res) {
 
         let id = req.params.id;
-        let removedBooks = _.remove(books, o => o.id == id);
-
-        if (removedBooks.length == 0) {
-            res.status(404);
-            res.send()
-        }
-        else {
-            res.json(removedBooks[0]);
-        }
+        this.bookService.deleteByID(id)
+            .then((rowDeleted)=>{
+                if (rowDeleted === 1) {
+                    console.log('Deleted successfully');
+                    res.status(200)
+                }
+                else{
+                    res.status(500)
+                    res.end()
+                }}).catch((err)=>{
+                    res.status(500)
+                    res.end()
+                }) 
     }
 
+
+
+    //Create
     create(req, res) {
 
-        let sorted = _.sortBy(books, o => o.id, 'asc');
-        let index = sorted[sorted.length - 1].id + 1;
-
         let newBook = req.body;
-        newBook.id = index;
-        books.push(newBook);
 
-        res.send(newBook);
+        this.bookService.create(newBook)
+            .then((newBook) => {
+                res.send(newBook);
+            })
+            .catch((err) => {
+                res.status(500)
+                res.end();
+            })
+
+
     }
+
+    // create(req, res) {
+
+
+
+    //     let sorted = _.sortBy(books, o => o.id, 'asc');
+    //     let index = sorted[sorted.length - 1].id + 1;
+
+    //     let newBook = req.body;
+    //     newBook.id = index;
+    //     books.push(newBook);
+
+    //     res.send(newBook);
+    // }
 
     update(req, res) {
         let id = req.params.id;
@@ -75,6 +124,25 @@ class bookCtrl {
             res.send(book);
         }
     }
+    // update(req, res) {
+    //     let id = req.params.id;
+    //     let book = _.find(books, { 'id': id });
+    //     let updatedBook = req.body
+
+    //     if (book == undefined) {
+    //         res.status(404);
+    //         res.send()
+    //     }
+
+    //     else {
+
+    //         for (let key in updatedBook) {
+    //             book[key] = updatedBook[key];
+    //         }
+
+    //         res.send(book);
+    //     }
+    // }
 }
 
 module.exports = bookCtrl;
