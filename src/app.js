@@ -76,7 +76,7 @@ class App {
                     res.json({
                         token: token
                     });
-                    
+
                 })
                 .catch(err => {
                     res.status(401);
@@ -85,6 +85,7 @@ class App {
 
         });
 
+        //TODO: extract to it own controller
         this.express.get('/api/v1/me', function (req, res) {
 
             try {
@@ -106,7 +107,7 @@ class App {
         })
 
         //routes
-        this.express.use('/api/v1/books', this.bookRoute);
+        this.express.use('/api/v1/books', [this._isValidUserMW, this.bookRoute]);
 
         return Promise.resolve();
 
@@ -124,6 +125,29 @@ class App {
                 //TODO: handle bootstrap error
                 throw err;
             })
+
+    }
+
+
+    _isValidUserMW(req, res, next) {
+
+        try {
+            let toDecode;
+            if (req.headers["x-auth"]) {
+                toDecode = req.headers["x-auth"];
+            }
+            else {
+                toDecode = res.cookies.token;
+            }
+
+            var token = jwt.verify(toDecode, JWT_SECRET);
+            req.user = token.user;
+            next();
+        }
+        catch (e) {
+            res.status(401);
+            res.end();
+        }
 
     }
 
