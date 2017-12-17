@@ -1,15 +1,17 @@
-const Book = require('../db/models').Book;
+const BookModel = require('../db/models').Book;
+
 
 //TODO: FIX method naming
 
-class BooskServices {
+class BookServices {
 
     // (newBookModel) => Promise<newBook>
     create(book) {
 
-        return Book.create(book)
-            .then(book => {
-                return book.toJSON();
+
+        return BookModel.create(book)
+            .then(newBook => {
+                return newBook.toJSON();
             })
             .catch(err => {
                 //TODO: Unknown error
@@ -22,7 +24,7 @@ class BooskServices {
 
         //TODO: delete should return the deleted book instense
 
-        return Book.destroy({ where: { id: id } })
+        return BookModel.destroy({ where: { id: id } })
             .then(rowDeleted => {
 
                 if (!rowDeleted) {
@@ -41,7 +43,7 @@ class BooskServices {
     }
 
     getAll() {
-        return Book
+        return BookModel
             .findAll()
             .then(books => {
                 return books;
@@ -54,7 +56,7 @@ class BooskServices {
     }
 
     getById(id) {
-        return Book
+        return BookModel
             .findAll({ where: { id: id } })
             .then(books => {
                 let book = books[0]
@@ -70,10 +72,10 @@ class BooskServices {
     }
 
     updateById(id, book) {
-        return Book
+        return BookModel
             .update(
-                book,                   //what to update
-                { where: { id: id } }   //who to update
+            book,                   //what to update
+            { where: { id: id } }   //who to update
             )
             .then(rowUpdated => {
 
@@ -90,4 +92,4 @@ class BooskServices {
     }
 }
 
-module.exports = BooskServices;
+module.exports = BookServices;

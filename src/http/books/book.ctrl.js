@@ -1,11 +1,11 @@
 const _ = require('lodash')
-const BooskServices = require('../../services/book.service');
+const BookServices = require('../../services/book.service');
 
 
 class bookCtrl {
 
     constructor() {
-        this.bookService = new BooskServices();
+        this.bookService = new BookServices();
     }
 
     getById(req, res) {

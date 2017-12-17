@@ -1,113 +1,75 @@
-class Calc {
+const mock = require('mock-require');
+const DONT_CARE = "DONT_CARE";
 
-	add(a, b) {
+describe("BookServices", () => {
 
-		if (typeof a == 'string' || typeof b == 'string') {
-			throw new Error('String is not allowd !');
+	let bookServices;
+	let mockModels;
+
+	beforeEach(() => {
+
+		mockModels = {
+			Book: {}
 		}
 
-		return a + b;
-	}
+		//injects mocks 
+		mock('../db/models', mockModels);
 
-	sub(a, b) {
-		return a - b;
-	}
+		//init model
+		const BookServices = mock.reRequire('./book.service');
 
-	subAsync(a, b, cb) {
-		setTimeout(() => {
-			let res = this.sub(a, b);
-			cb(null, res);
-		}, 0);
-	}
-
-	subPromise(a, b) {
-		return new Promise((resolve, reject) => {
-			this.subAsync(a, b, (err, res) => {
-				if (err) {
-					reject(err);
-				}
-				else {
-					resolve(res)
-				}
-			})
-		})
-		 
-	}
-
-}
-
-
-describe("Calc ", function () {
-
-	let calc;
-
-	beforeEach(()=>{
-		calc = new Calc();
-	});
-
-	describe("add", function () {
-
-		it("should add two numbers", function () {
-
-			var res = calc.add(1, 2);
-
-			calc.sub = 22;
-
-			expect(res).toBe(3);
-		});
-
-		it("should not add string", function () {
-
-			var res;
-
-			try {
-				res = calc.add(1, "this is a string");
-			}
-			catch (e) {
-
-			}
-
-			expect(res).toBe(undefined);
-
-		});
+		//create instance
+		bookServices = new BookServices();
 
 	});
 
-	describe("sub", function () {
-		it("should subtract b from a", function () {
+	describe("create", () => {
 
-			var res = calc.sub(3, 2);
+		it("should sucsseuly create a new book", (done) => {
 
-			expect(res).toBe(1);
-		});
+			//given
+			let book = DONT_CARE;
+			let createStab = (book) => {
 
-	});
+				return Promise.resolve({
+					toJSON: () => {
+						return DONT_CARE
+					}
+				});
 
-	describe("subAsync", function () {
-		it("should subtract b from a", function (done) {
+			};
 
-			calc.subAsync(3, 2, (err, res) => {
+			//when
+			mockModels.Book.create = createStab; //inject
+			let createPromise = bookServices.create(book);
 
-				expect(res).toBe(1);
+			//then
+			createPromise.then((newBook) => {
+				expect(newBook).toBeDefined();
 				done();
 			});
 
 		});
 
-	});
+		it("should handle the error", (done) => {
 
-	describe("subPromise", function () {
-		it("should subtract b from a", function (done) {
+			//given
+			let book = DONT_CARE;
+			let createStab = (book) => {
+				return Promise.reject(DONT_CARE);
+			};
 
-			calc.subPromise(3, 2)
-				.then((res) => {
-					expect(res).toBe(1);
-					done();
-				});
+			//when
+			mockModels.Book.create = createStab; //inject
+			let createPromise = bookServices.create(book);
+
+			//then
+			createPromise.catch((err) => {
+				expect(err).toBeDefined();
+				done();
+			});
 
 		});
-
 	});
 
 });
-
