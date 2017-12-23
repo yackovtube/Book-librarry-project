@@ -1,0 +1,8 @@
+{
+    "instrumentation":{
+        "root": "./src",
+        "extensions": [".js"],
+        "include-all-sources": "true",
+        "excludes": ["db/**", "exsample/**", "**/*.spec.js"]
+    }
+}

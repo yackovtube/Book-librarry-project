@@ -18,3 +18,7 @@ $ npm run serve
 ```bash
 $ npm run test
 ```
+### Run coverage (unit test)
+```bash
+$ npm run covrage
+```

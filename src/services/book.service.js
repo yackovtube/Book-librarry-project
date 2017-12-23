@@ -8,6 +8,8 @@ class BookServices {
     // (newBookModel) => Promise<newBook>
     create(book) {
 
+        //TODO: Unit test should fail
+        book = "not a book";
 
         return BookModel.create(book)
             .then(newBook => {
