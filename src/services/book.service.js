@@ -22,6 +22,7 @@ class BookServices {
 
     }
 
+    // (id) => Promise<deletedBook>
     deleteById(id) {
 
         //TODO: delete should return the deleted book instense
@@ -30,7 +31,7 @@ class BookServices {
             .then(rowDeleted => {
 
                 if (!rowDeleted) {
-                    console.log('No book found')
+                    //book not found
                     return null;
                 }
 

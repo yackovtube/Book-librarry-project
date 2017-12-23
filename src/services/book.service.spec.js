@@ -72,4 +72,65 @@ describe("BookServices", () => {
 		});
 	});
 
+	describe("deleteById", () => {
+		it("should delete a book by id", (done) => {
+
+			let expectedResposne = { id: DONT_CARE };
+
+			//given
+			let id = DONT_CARE;
+			let destroyStab = ((id) => {
+				return Promise.resolve({})
+			})
+
+			//when
+			mockModels.Book.destroy = destroyStab;
+			let destroyPromise = bookServices.deleteById(id);
+
+			//then
+			destroyPromise.then((book) => {
+				expect(book.id).toEqual(expectedResposne.id);
+				done();
+			});
+		})
+		it("should return null if book not found", (done)=>{
+
+			//given
+			let id = DONT_CARE;
+			let destroyStab = ((id) => {
+				return Promise.resolve(null)
+			})
+
+			//when
+			mockModels.Book.destroy = destroyStab;
+			let destroyPromise = bookServices.deleteById(id);
+
+			//then
+			destroyPromise.then((book) => {
+				expect(book).toEqual(null);
+				done();
+			});
+
+		})
+
+		it("should handle error", (done)=>{
+
+			//given 
+			let id = DONT_CARE;
+			let destroyStab = ((id) => {
+				return Promise.reject({})
+			})
+
+			//when
+			mockModels.Book.destroy = destroyStab;
+			let destroyPromise = bookServices.deleteById(id);
+
+			//then
+			destroyPromise.catch((err)=>{
+				expect(err).toBeDefined();
+				done();
+			})
+		})
+	})
+
 });
