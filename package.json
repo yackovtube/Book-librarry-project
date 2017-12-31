@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "serve": "node src",
-    "test": "node_modules/jasmine/bin/jasmine.js --config=jasmine.json",
-    "covrage":"./node_modules/.bin/istanbul cover node_modules/jasmine/bin/jasmine.js --config=istanbul.json JASMINE_CONFIG_PATH=jasmine.json"
+    "test": "node_modules/.bin/jasmine --config=jasmine.json",
+    "covrage": "./node_modules/.bin/istanbul cover node_modules/jasmine/bin/jasmine.js --config=istanbul.json JASMINE_CONFIG_PATH=jasmine.json"
   },
   "author": "",
   "license": "ISC",

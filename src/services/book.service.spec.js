@@ -93,7 +93,7 @@ describe("BookServices", () => {
 				done();
 			});
 		})
-		it("should return null if book not found", (done)=>{
+		it("should return null if book not found", (done) => {
 
 			//given
 			let id = DONT_CARE;
@@ -113,7 +113,7 @@ describe("BookServices", () => {
 
 		})
 
-		it("should handle error", (done)=>{
+		it("should handle error", (done) => {
 
 			//given 
 			let id = DONT_CARE;
@@ -126,11 +126,75 @@ describe("BookServices", () => {
 			let destroyPromise = bookServices.deleteById(id);
 
 			//then
-			destroyPromise.catch((err)=>{
+			destroyPromise.catch((err) => {
 				expect(err).toBeDefined();
 				done();
 			})
 		})
 	})
+	
+	describe("get all", () => {
+
+		it("should sucsseuly get all books", (done) => {
+
+			//given
+			let findAllStab = () => {
+				return Promise.resolve({});
+			};
+
+			//when
+			mockModels.Book.findAll = findAllStab;
+			let findAllPromise = bookServices.getAll();
+
+			//then
+			findAllPromise.then((books) => {
+				expect(books).toBeDefined();
+				done();
+			})
+		});
+
+		it("should handle error", (done) => {
+
+			//given
+			let findAllStab = () => {
+				return Promise.reject({});
+			};
+
+			//when
+			mockModels.Book.findAll = findAllStab;
+			let findAllPromise = bookServices.getAll();
+
+			//then
+			findAllPromise.catch((err) => {
+				expect(err).toBeDefined();
+				done();
+			})
+		});
+	});
+
+	describe("getById", () => {
+
+		it("should get a book by id", (done) => {
+
+			//given
+			let id = DONT_CARE;
+			let book = DONT_CARE;
+			let findAllStab = ((queryObject) => {
+				return Promise.resolve([book])
+			})
+
+			//when
+			mockModels.Book.findAll = findAllStab;
+			let getByIdPromise = bookServices.getById(id);
+
+			//then
+			getByIdPromise.then((book) => {
+				expect(book).toBeDefined();
+				done();
+			});
+		})
+	})
+
+
 
 });

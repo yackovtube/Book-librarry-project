@@ -59,10 +59,15 @@ class BookServices {
     }
 
     getById(id) {
+
+        let query = { where: 
+            { id: id } 
+        };
+
         return BookModel
-            .findAll({ where: { id: id } })
+            .findAll(query)
             .then(books => {
-                let book = books[0]
+                let book = books[0];
 
                 if (!book) {
                     //TODO no books in db err
